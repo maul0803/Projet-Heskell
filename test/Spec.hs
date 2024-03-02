@@ -1,3 +1,4 @@
+--Pour tester, il faut lance le Spec.hs dans le src (copier, coller)
 import RLE
 import Statistic.EncodingTree
 import Statistic.Bit
