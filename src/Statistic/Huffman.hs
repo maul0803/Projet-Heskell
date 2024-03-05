@@ -51,7 +51,7 @@ sortFreqAsc [] = [] -- Cas de base
 sortFreqAsc (h:t) = sortFreqAsc below ++ [h] ++ sortFreqAsc above
   where below = filter (\y -> getFrequency y < getFrequency h) t
         above = filter (\y -> getFrequency y >= getFrequency h) t
-
+-- | Huffman tree generation
 tree :: Ord a => [a] -> Maybe (EncodingTree a)
 tree [] = Nothing  -- Si la liste est vide, retourner Nothing
 tree text = Just $ head $ createNewList $ convertListOfSymbols $ frequencies text
