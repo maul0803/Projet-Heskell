@@ -44,7 +44,7 @@ sortFreqAsc (h:t) = sortFreqAsc below ++ [h] ++ sortFreqAsc above
 
 -- Seconde partie: Retourner 2 sublists
 --2. Couper en deux sous-distributions les plus équilibrées possibles
--- Ce que je fais, c'est que j'obtiens les 2 listes les plus proches du millieu (avant de dépasser la limite et après avoir dépassé la limite), puis je les compares,
+-- Ce que je fais, c'est que j'obtiens les 2 listes les plus proches du millieu (avant de dépasser la limite et après avoir dépassé la limite), puis je les compare,
 -- dans dividedList avec la variable diff
 -- Retourne 2 listes, séparé selon la plus proche du millieu
 divideList :: Int -> [(a,Int)] -> (Int,[(a,Int)],Int,[(a,Int)])
