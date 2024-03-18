@@ -80,8 +80,6 @@ splitEqually'' [(h,freq)] left right = (left ++ [(h,freq)], right) -- Cas de bas
 splitEqually'' ((h1,freq1):(h2,freq2):t) left right
   | diffBeforeMiddle - diffAfterMiddle > 0 = (left ++ [(h1,freq1)] ++ [(h2,freq2)], right ++ t) -- Si c'est positif, alors AfterMiddle est meilleur (SI LA LISTE EST DECROISSANTE)
   | otherwise = (left ++ [(h1,freq1)], right ++ [(h2,freq2)] ++ t)  -- Sinon, BeforeMiddle est meilleur (SI LA LISTE EST DECROISSANTE)
---  | diffBeforeMiddle - diffAfterMiddle > 0 = (left ++ [(h1,diffBeforeMiddle)] ++ [(h2,middle)], right ++ t) -- Si c'est positif, alors AfterMiddle est meilleur
---  | otherwise = (left ++ [(h1,diffBeforeMiddle)], right ++ [(h2,middle)] ++ t)  -- Sinon, BeforeMiddle est meilleur
   where
     diffBeforeMiddle = abs(fromIntegral(sumOfFrequencies left + freq1) - middle)
     diffAfterMiddle = abs(fromIntegral(sumOfFrequencies left + freq1 + freq2) -middle)
