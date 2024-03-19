@@ -70,14 +70,15 @@ meanLength tree = foldl (\acc (len, depth) -> acc + fromIntegral (len * depth) /
     numbersLeafs (EncodingNode _ left right) depth = numbersLeafs left (depth + 1) ++ numbersLeafs right (depth + 1)
 
 -- | Compress method using a function generating encoding tree and also returns generated encoding tree
+-- Correction dans compress pour utiliser concatMap
 compress :: Eq a => ([a] -> Maybe (EncodingTree a)) -> [a] -> (Maybe (EncodingTree a), [Bit])
 compress encodingTree text = (encodingTreeResult, encodedText)
   where
     encodingTreeResult = encodingTree text
-    
+
     encodedText = case encodingTreeResult of
-                    Just tree -> foldl (\acc x -> acc ++ fromMaybe [] (encode tree x)) [] text
-                    Nothing -> []
+        Just tree -> concatMap (fromMaybe [] . encode tree) text
+        Nothing -> []
 
     fromMaybe defVal maybeVal = case maybeVal of
                     Just val -> val

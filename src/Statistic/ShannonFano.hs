@@ -5,6 +5,9 @@
 -}
 module Statistic.ShannonFano(tree) where
 import Statistic.EncodingTree ( EncodingTree(..) )
+import Data.Ord (comparing, Down(..))
+import Data.List (sortBy)
+
 
 {-
 1. Trier la distribution des symboles rangée par ordre décroissant du
@@ -23,9 +26,11 @@ elementCount (h:t) symbol
   | h == symbol = 1 + elementCount t symbol
   | otherwise = 0 + elementCount t symbol
 -- Retourne une liste des fréquences de chaque lettre
+-- éviter de calculer plusieurs fois la fréquence du même élément
 frequencies :: (Eq a) => [a] -> [(a, Int)]
-frequencies [] = []
-frequencies (h:t) = (h, elementCount (h:t) h) : frequencies (filter (/= h) t)
+frequencies xs = map (\x -> (x, length . filter (== x) $ xs)) . unique $ xs
+  where unique [] = []
+        unique (y:ys) = y : unique (filter (/=y) ys)
 
 -- Retourne la somme de toutes les fréquences
 sumOfFrequencies :: [(a, Int)] -> Int
@@ -40,36 +45,28 @@ nombre d'apparitions
 -}
 
 sortFreqDesc :: [(a,Int)] -> [(a,Int)]
-sortFreqDesc [] = [] -- Cas de base
-sortFreqDesc (h:t) = sortFreqDesc below ++ [h] ++ sortFreqDesc above
-  where below = filter (\y -> snd y >= snd h) t
-        above = filter (\y -> snd y < snd h) t
+sortFreqDesc = sortBy (comparing (Down . snd))
+
 {-
 2. Couper en deux sous-distributions les plus équilibrées possibles
 3. Recommencer l'étape 2 sur chaque sous-distribution jusqu'à obtenir
 des distributions à un symbole
 4. Construire l'arbre à partir des coupes
 -}
+-- dans le cas simple d'un seul symbole, on créé deux branches pour s'assurer que l'arbre n'est pas dégénéré.
 buildTree :: [(a, Int)] -> EncodingTree a
-buildTree [(sym, frequency)] = EncodingLeaf frequency sym
-buildTree freqs =
-    let (left, right) = splitEqually freqs
-    in EncodingNode frequency (buildTree left) (buildTree right)
+buildTree xs
+  | length xs == 1 = let [(sym, freq)] = xs in EncodingNode freq (EncodingLeaf freq sym) (EncodingLeaf freq sym) -- Crée deux branches pour un seul symbole
+  | otherwise = let (left, right) = splitEqually xs in EncodingNode (sumFreq xs) (buildTree left) (buildTree right)
   where
-    frequency = sumOfFrequencies freqs
+    sumFreq = sum . map snd
+
 {-
 2. Couper en deux sous-distributions les plus équilibrées possibles
 -}
+
 splitEqually :: [(a, Int)] -> ([(a, Int)], [(a, Int)])
-splitEqually [left,right] =  ([left],[right])
-splitEqually freqs = splitEqually' freqs [] []
-  where
-    middle = sumOfFrequencies freqs `div` 2
-    splitEqually' [] left right = (left, right)
-    splitEqually' [(h,freq)] left right = (left ++ [(h,freq)], right) -- Cas de base pour le dernier élément unique
-    splitEqually' ((h1,freq1):(h2,freq2):t) left right
-      | sumOfFrequencies left + freq1 + freq2 >= middle = splitEqually'' ((h1,freq1):(h2,freq2):t) left right
-      | otherwise = splitEqually' ((h2,freq2):t) (left ++ [(h1,freq1)]) (right)    
+splitEqually freqs = splitAt (length freqs `div` 2) $ sortBy (comparing snd) freqs
 
 splitEqually'' :: [(a, Int)] -> [(a, Int)] -> [(a, Int)] -> ([(a, Int)], [(a, Int)])
 splitEqually'' [] left right = (left, right)
@@ -87,4 +84,4 @@ divide x y = fromIntegral x / fromIntegral y
 
 tree :: Ord a => [a] -> Maybe (EncodingTree a)
 tree [] = Nothing
-tree symbols = Just $ buildTree $ sortFreqDesc $ frequencies symbols
+tree symbols = Just . buildTree . sortFreqDesc . frequencies $ symbols
