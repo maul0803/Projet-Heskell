@@ -38,9 +38,6 @@ sumOfFrequencies (h:t) = frequency + sumOfFrequencies t
 1. Trier la distribution des symboles rangée par ordre décroissant du
 nombre d'apparitions
 -}
-shannonFano :: Ord a => [(a, Int)] -> Maybe (EncodingTree a)
-shannonFano [] = Nothing
-shannonFano freqs = Just $ buildTree $ sortFreqDesc freqs
 
 sortFreqDesc :: [(a,Int)] -> [(a,Int)]
 sortFreqDesc [] = [] -- Cas de base
@@ -91,4 +88,4 @@ divide x y = fromIntegral x / fromIntegral y
 
 tree :: Ord a => [a] -> Maybe (EncodingTree a)
 tree [] = Nothing
-tree symbols = shannonFano $ frequencies symbols
+tree symbols = Just $ buildTree $ sortFreqDesc $ frequencies symbols
