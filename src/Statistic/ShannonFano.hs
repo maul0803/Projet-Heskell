@@ -3,7 +3,7 @@
   Description : A module containing specifics for the Shannon-Fano compression method
   Maintainer : ???
 -}
-module Statistic.ShannonFanoV1(tree) where
+module Statistic.ShannonFano(tree) where
 import Statistic.EncodingTree ( EncodingTree(..) )
 
 {-
