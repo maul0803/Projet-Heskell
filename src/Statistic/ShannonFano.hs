@@ -78,9 +78,8 @@ splitEqually'' ((h1,freq1):(h2,freq2):t) left right
   | diffBeforeMiddle - diffAfterMiddle > 0 = (left ++ [(h1,freq1)] ++ [(h2,freq2)], right ++ t) -- Si c'est positif, alors AfterMiddle est meilleur (SI LA LISTE EST DECROISSANTE)
   | otherwise = (left ++ [(h1,freq1)], right ++ [(h2,freq2)] ++ t)  -- Sinon, BeforeMiddle est meilleur (SI LA LISTE EST DECROISSANTE)
   where
-    diffBeforeMiddle = abs(fromIntegral(sumOfFrequencies left + freq1) - middle)
-    diffAfterMiddle = abs(fromIntegral(sumOfFrequencies left + freq1 + freq2) -middle)
-    middle = divide (sumOfFrequencies t + sumOfFrequencies left + sumOfFrequencies right + freq1 + freq2)  2
+    diffBeforeMiddle = abs((sumOfFrequencies left + freq1) - (sumOfFrequencies t + sumOfFrequencies right + freq2)) 
+    diffAfterMiddle = abs((sumOfFrequencies left + freq1 + freq2) - (sumOfFrequencies t + sumOfFrequencies right))
 
 -- Fait la division de 2 entiers et retourne un float
 divide :: Int -> Int -> Float
