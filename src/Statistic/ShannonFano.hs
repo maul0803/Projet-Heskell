@@ -27,24 +27,25 @@ elementCount (h:t) symbol
   | otherwise = 0 + elementCount t symbol
 -- Retourne une liste des fréquences de chaque lettre
 -- éviter de calculer plusieurs fois la fréquence du même élément
-frequencies :: (Eq a) => [a] -> [(a, Int)]
+frequencies :: Eq a => [a] -> [(a, Int)]
 frequencies xs = map (\x -> (x, length . filter (== x) $ xs)) . unique $ xs
   where unique [] = []
         unique (y:ys) = y : unique (filter (/=y) ys)
 
 -- Retourne la somme de toutes les fréquences
 sumOfFrequencies :: [(a, Int)] -> Int
-sumOfFrequencies [] = 0
+sumOfFrequencies = sum . map snd
+{-
 sumOfFrequencies (h:t) = frequency + sumOfFrequencies t
     where
         (symbol,frequency) = h
-  
+-}
 {-
 1. Trier la distribution des symboles rangée par ordre décroissant du
 nombre d'apparitions
 -}
 
-sortFreqDesc :: [(a,Int)] -> [(a,Int)]
+sortFreqDesc :: [(a, Int)] -> [(a, Int)]
 sortFreqDesc = sortBy (comparing (Down . snd))
 
 {-
@@ -56,17 +57,24 @@ des distributions à un symbole
 -- dans le cas simple d'un seul symbole, on créé deux branches pour s'assurer que l'arbre n'est pas dégénéré.
 buildTree :: [(a, Int)] -> EncodingTree a
 buildTree xs
-  | length xs == 1 = let [(sym, freq)] = xs in EncodingNode freq (EncodingLeaf freq sym) (EncodingLeaf freq sym) -- Crée deux branches pour un seul symbole
-  | otherwise = let (left, right) = splitEqually xs in EncodingNode (sumFreq xs) (buildTree left) (buildTree right)
-  where
-    sumFreq = sum . map snd
+  | length xs <= 1 = case xs of
+                        [(sym, freq)] -> EncodingLeaf freq sym
+                        _ -> error "Cannot build tree from empty list"
+  | otherwise = let (left, right) = splitEqually xs in EncodingNode (sumOfFrequencies xs) (buildTree left) (buildTree right)
 
 {-
 2. Couper en deux sous-distributions les plus équilibrées possibles
 -}
 
 splitEqually :: [(a, Int)] -> ([(a, Int)], [(a, Int)])
-splitEqually freqs = splitAt (length freqs `div` 2) $ sortBy (comparing snd) freqs
+splitEqually freqs =
+  let halfWeight = sumOfFrequencies freqs `div` 2
+      addElem (l, r, sumL) x@(sym, freq)
+        | sumL + freq <= halfWeight = (l ++ [x], r, sumL + freq)
+        | otherwise = (l, r ++ [x], sumL)
+      (left, right, _) = foldl addElem ([], [], 0) freqs
+  in (left, right)
+
 
 splitEqually'' :: [(a, Int)] -> [(a, Int)] -> [(a, Int)] -> ([(a, Int)], [(a, Int)])
 splitEqually'' [] left right = (left, right)
