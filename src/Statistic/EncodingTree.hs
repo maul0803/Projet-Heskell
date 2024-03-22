@@ -6,7 +6,7 @@
 module Statistic.EncodingTree(EncodingTree(..), isLeaf, count, has, encode, decodeOnce, decode, meanLength, compress, uncompress) where
 
 import Statistic.Bit
-import Data.Maybe (catMaybes)
+import Data.Maybe()
 data EncodingTree a = EncodingNode Int (EncodingTree a) (EncodingTree a)
                     | EncodingLeaf Int a
   deriving (Eq, Show)
@@ -23,11 +23,8 @@ count (EncodingNode cnt _ _) = cnt
 
 -- | Search for symbol in encoding tree
 has :: Eq a => EncodingTree a -> a -> Bool
-has (EncodingLeaf _ x) symbol 
-  |x == symbol = True
-  |x /= symbol = False
--- has (EncodingLeaf _ x) symbol = x == symbol marche aussi et est plut court
-has (EncodingNode _ left right) symbol = has left symbol || has right symbol 
+has (EncodingLeaf _ x) symbol = x == symbol
+has (EncodingNode _ left right) symbol = has left symbol || has right symbol
 
 -- | Computes the binary code of symbol using encoding tree
 -- If computation is not possible, returns `Nothing`.
@@ -49,7 +46,7 @@ encodeForLeaf :: Eq a => EncodingTree a -> a -> Maybe [Bit]
 encodeForLeaf (EncodingLeaf _ x) symbol
   | x == symbol = Just [Zero] -- Le symbole est dans l'arbre, on ajouter rien à la liste
   | otherwise = Nothing -- Le symbole n'est pas danc l'arbre
-encodeForLeaf (EncodingNode _ left right) symbol = Nothing
+encodeForLeaf (EncodingNode _ _ _) _ = Nothing
 
 -- | Computes the first symbol from list of bits using encoding tree and also returns the list of bits still to process
 -- If computation is not possible, returns `Nothing`.
@@ -64,10 +61,10 @@ decodeOnceMain (EncodingNode _ left right) (bit:bits)-- On sépare l'array de bi
   | bit == Zero = decodeOnceMain left bits
   | bit == One = decodeOnceMain right bits
 decodeOnceMain _ _ = Nothing
--- Fonction utilisée uniquement pour les arbres avec qu'une seule feuille
 decodeOnceForLeaf :: EncodingTree a -> [Bit] -> Maybe (a, [Bit])
-decodeOnceForLeaf (EncodingLeaf _ symbol) (h:t) = Just (symbol, t)-- On a directement une feuille normalement
-decodeOnceForLeaf (EncodingNode _ _ _) _ = Nothing
+decodeOnceForLeaf (EncodingLeaf _ symbol) (_:t) = Just (symbol, t) -- On a directement une feuille normalement
+decodeOnceForLeaf (EncodingLeaf _ symbol) []     = Just (symbol, []) -- When there is a leaf and no more bits
+decodeOnceForLeaf (EncodingNode _ _ _) _        = Nothing
 
 -- Fonction pour tester si la taille de l'arbre d'encodage est de 0
 isMeanLengthZero :: EncodingTree a -> Bool
