@@ -2,6 +2,8 @@ import RLE
 import Statistic.EncodingTree
 import qualified Statistic.Huffman
 import qualified Statistic.ShannonFano
+import LZ.LZ78
+import LZ.LZW
 
 -- Fonction pour tester un texte donné
 testText :: String -> IO ()
@@ -33,6 +35,20 @@ testText text = do
     putStrLn $ "Texte compressé : " ++ show compressed_text_Shannon
     putStrLn $ "Texte décompressé : " ++ show uncompressed_text_Shannon
     putStrLn $ "---------------------------------------------------------------------------------------------------"
+    -- LZ78
+    putStrLn $ "LZ78 : "
+    let compressed_text_LZ78 = LZ.LZ78.compress text
+        uncompressed_text_LZ78 = LZ.LZ78.uncompress compressed_text_LZ78
+    putStrLn $ "Texte initial : " ++ show text
+    putStrLn $ "Texte compressé : " ++ show compressed_text_LZ78
+    putStrLn $ "Texte décompressé : " ++ show uncompressed_text_LZ78
+    -- LZW
+    putStrLn $ "LZW : "
+    let compressed_text_LZW = LZ.LZW.compress text
+        uncompressed_text_LZW = LZ.LZW.uncompress compressed_text_LZW
+    putStrLn $ "Texte initial : " ++ show text
+    putStrLn $ "Texte compressé : " ++ show compressed_text_LZW
+    putStrLn $ "Texte décompressé : " ++ show uncompressed_text_LZW
 
 main :: IO ()
 main = do
