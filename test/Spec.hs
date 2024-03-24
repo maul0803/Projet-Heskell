@@ -34,7 +34,7 @@ testText text = do
     putStrLn $ "Longueur moyenne : " ++ maybe "Arbre d'encodage non disponible" show longueur_moyenne_Shannon
     putStrLn $ "Texte compressé : " ++ show compressed_text_Shannon
     putStrLn $ "Texte décompressé : " ++ show uncompressed_text_Shannon
-    putStrLn $ "---------------------------------------------------------------------------------------------------"
+
     -- LZ78
     putStrLn $ "LZ78 : "
     let compressed_text_LZ78 = LZ.LZ78.compress text
@@ -49,7 +49,7 @@ testText text = do
     putStrLn $ "Texte initial : " ++ show text
     putStrLn $ "Texte compressé : " ++ show compressed_text_LZW
     putStrLn $ "Texte décompressé : " ++ show uncompressed_text_LZW
-
+    putStrLn $ "---------------------------------------------------------------------------------------------------"
 main :: IO ()
 main = do
     -- Testez tous les textes en commentaire
