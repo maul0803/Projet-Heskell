@@ -59,3 +59,5 @@ main = do
     testText "xbbzzaaabbbcccccccc" -- Shannon et Huffman différents
     testText "bzzzaaabbbccccc"  -- Shannon et Huffman pareils
     testText "aaaaa"
+
+    
